@@ -1,0 +1,8 @@
+technology to use:
+    - Typescript
+    - Node JS
+    - Tailwind CSS
+    - Pnpm
+    - TRPC
+    - MongoDB
+    - Docker & Docker Compose
