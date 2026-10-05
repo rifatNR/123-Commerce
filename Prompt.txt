@@ -83,6 +83,33 @@ The Design of the APP:
         - An option to mark orders as "Placed To Drop Shipping" once the manual process is completed or if integrated with a drop shipping service API.
 
 
+
+Performance and Optimization:
+    - Implement caching strategies using Cloudflare KV storage to reduce load on the backend and improve response times.
+    - Optimize images and assets for faster loading times, especially for mobile users.
+    - Ensure that the app is responsive and performs well across different devices and screen sizes.
+    - Use Presigned URL and upload the image to R2
+    - Implement lazy loading for images and other heavy assets to improve initial load times.
+    - Implement server-side rendering (SSR) for better SEO and faster initial page loads.
+    - make sure the app feels fast and responsive, even on slower internet connections, as many users in Bangladesh may have limited bandwidth.
+    - Implement proper error handling and user feedback mechanisms to enhance the user experience.
+
+
+
+Logging and Debugging:
+    - Implement logging for both frontend and backend to track errors, user actions, and system performance.
+
+
+SEO and Marketing:
+    - Implement SEO best practices to improve the app's visibility on search engines.
+    - Use meta tags, structured data, and other SEO techniques to enhance search engine rankings.
+    - Use proper og tags, images and descriptions for social media sharing to improve click-through rates from social media platforms.
+    - Integrate social media sharing features to allow users to share products and promotions easily.
+    - I haven't decided on the domain, app name or logo yet. so use this Domain for now "123Commerce.com" and app name "123Commerce" and logo "123Commerce Logo" for now. (we'll change it later when we decide on the final domain, app name and logo.)
+
+
+
+
 Extras:
     - Do work on Privacy Policy and Terms & Conditions pages for the app. These pages should be easily accessible from the footer of the app.
 
