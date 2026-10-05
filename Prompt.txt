@@ -37,6 +37,9 @@ Codebase:
     - Do try to make utilities and helper functions for repeated code. (so that the code is more readable and maintainable.)
     - Add some of the necessary ruleset in CLAUDE.md file (only the neccessary one for future reference)
     - for Authentication of admin panel use JWT token based authentication. use refresh token and access token.
+    - (This is important) for development nothing in the app will run locally. not even pnpm install. I want to run these commands using docker run so that everything remains inside docker.
+    - For development, the frontend and backend will run in separate docker containers, and they will communicate with each other through the network. (so that the development environment is isolated and consistent across different machines.)
+    - 
 
 
 
