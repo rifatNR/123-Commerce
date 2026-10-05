@@ -119,4 +119,8 @@ Things I missed:
     - This is my first time doing drop shipping or social media e-commerce business. So do remind me if I missed anything important that I should consider for this app. That will be better for the business and the app.
 
 
+More:
+    - The product or source structure can change in future, so make sure the app is flexible enough to handle changes in product structure and source structure. (so that we can easily adapt to changes in the product or source structure without having to make major changes to the app.)
+    
 
+First let's make the app and then we'll work on to upgrade it to a full-fledged e-commerce app with payment integration, delivery tracking, and other features. For now, let's focus on building the core functionality of the app as described above.
