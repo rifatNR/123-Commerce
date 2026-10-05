@@ -1,4 +1,4 @@
-technology to use:
+Technology to use:
     - Typescript
     - Node JS
     - Tailwind CSS
@@ -6,3 +6,37 @@ technology to use:
     - TRPC
     - MongoDB
     - Docker & Docker Compose
+    - Frontend: React with Next.js
+        - Use Cloudflare. I need to use KV storage for caching and only for caching. I don't want to use it for anything else. I want to use it for caching API responses and static assets.
+        - Frontend first checks if data exists in Cloudflare KV storage. If it does, it retrieves the data from KV storage. If not, it fetches the data from the backend API and stores it in KV storage for future requests.
+        - Make some API route for the backend to connect to request the frontend to save some data
+        so the architecture will be like this:
+            - Frontend (Next.js) <-> Cloudflare KV Storage
+            - Backend (Node.js with TRPC) <-> MongoDB (but also Backend -> Posts update to Frontend API route to save data in KV storage)
+    
+    - Backend:
+        - Use TRPC for building the API routes.
+        - Connect to MongoDB for data storage.
+        - Implement API routes for CRUD operations on posts.
+        - Implement an API route that allows the frontend to request saving data in Cloudflare KV storage.
+
+
+
+
+About the APP:
+    - This is a simple e-commerce app.
+    - Will mostly used for ordering products to user who comes from Facebook ads (or other social media ads).
+    - The products of the app can come from different sources, so the app should be able to handle multiple product sources.
+
+
+
+
+
+
+
+
+
+
+
+
+
