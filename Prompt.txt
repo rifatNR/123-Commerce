@@ -143,3 +143,6 @@ More:
     
 
 First let's make the app and then we'll work on to upgrade it to a full-fledged e-commerce app with payment integration, delivery tracking, and other features. For now, let's focus on building the core functionality of the app as described above.
+
+But must remamber, that this is a very lightweight app. So do not make it heavy or bloated with unnecessary features or libraries. Keep it simple, fast, and efficient. 
+if I took any wrong decision or if you think something can be done better, please let me know. I am open to suggestions and improvements.
