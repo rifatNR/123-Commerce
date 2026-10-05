@@ -5,14 +5,16 @@ Technology to use:
     - Pnpm
     - TRPC
     - MongoDB
-    - Docker & Docker Compose
+    - Turbo Repo
+    - Docker & Docker Compose (for local development: will run with mono repo and docker compose but for production will be deployed separately)
+    - Frontend will be deployed on cloudflare and backend will be deployed on Railway (or Render or any other service that supports Node.js and MongoDB)
     - Frontend: React with Next.js
         - Use Cloudflare. I need to use KV storage for caching and only for caching. I don't want to use it for anything else. I want to use it for caching API responses and static assets.
         - Frontend first checks if data exists in Cloudflare KV storage. If it does, it retrieves the data from KV storage. If not, it fetches the data from the backend API and stores it in KV storage for future requests.
         - Make some API route for the backend to connect to request the frontend to save some data
         so the architecture will be like this:
-            - Frontend (Next.js) <-> Cloudflare KV Storage
-            - Backend (Node.js with TRPC) <-> MongoDB (but also Backend -> Posts update to Frontend API route to save data in KV storage)
+            - Frontend <-> Cloudflare KV Storage
+            - Backend <-> MongoDB (but also Backend -> Posts update to Frontend API route to save data in KV storage)
     
     - Backend:
         - Use TRPC for building the API routes.
@@ -24,19 +26,70 @@ Technology to use:
 
 
 About the APP:
-    - This is a simple e-commerce app.
+    - This is a simple e-commerce app. (that has regular delivery products but mostly third party delivery products that will be used as drop shipping. So we'll sell products that we don't have in stock and will be delivered by a third party.)
+    - This app is mostly for bangladeshi customes.
     - Will mostly used for ordering products to user who comes from Facebook ads (or other social media ads).
     - The products of the app can come from different sources, so the app should be able to handle multiple product sources.
+    - User can only add to card, place orders no payment integration is needed. The payment and delivery will be handled offline by the seller. (will discuss the flow latter.)
 
 
 
+App Flow:
+    - 2 type of user: Admin and Customer.
+    - Customer comes from social media ads and can browse products, add them to the cart, and place orders.
+    - Admin will see that bunch of new orders have been placed in a dashboard like a list. then see the details (each detail will have a copy icon.)
+    - Then manually we will contact some other service to handle the payment and delivery. (and mark the order as "Placed To Drop Shipping" in the dashboard.) (we'll call this manual process "Drop Shipping Process" and will be handled offline by the seller.)
+    - now this Drop Shipping Process may or may not be automatic too. If I find a way or api of the drop shipping service to place orders then I might have a button with each order item "Place Order to Drop Shipping" and when clicked it will send the order details to the drop shipping service and mark the order as "Placed To Drop Shipping" in the dashboard.
+    - In future we might add products other than drop shipping products, so the app should be able to handle both types of products (drop shipping and regular delivery products).
+    - Keep multiple sources of products in mind. The app should be able to handle products from different sources and display them accordingly. So I can work with multiple drop shipping companies and also have my own products in the same app. (so the app should be able to handle both types of products and display them accordingly.)
+    - from admin panel I'll select what products brand etc to show on the app. (so the admin can select what products to show on the app and what products to hide.)
+    
+
+About product upload:
+    - I can add 800 products from one company and 1000 products from another company and the app should be store all source products separately and the main products we'll import to the app "Products" collection and the source products will be stored in their own collections. (so the app should be able to handle multiple sources of products and display them accordingly.)
+    - I'll upload the products with image and everything from terminal using some script.
+    - So the app should have some end point to take products from the script and store them in the database. The API will take specific format and the data will be stored in one fixed specific format.
+    - The script will transform the data from the source format to the app's fixed specific format and send it to the API endpoint. The API will then store the data in the database in the fixed specific format.
+    - You don't need to make the script. I'll make the script later. You just need to make the API endpoint that will take the data from the script and store it in the database in the fixed specific format.
+    - Keep the source products and main products separate and flexible so that any kind of products can fit.
+    - Make API to get products too so that my script knows what products are already in the database and can avoid duplicates. (so the script will first call the API to get the existing products and then only send the new products to the API endpoint to store them in the database.)
+    - Also make API for update and delete products
 
 
 
+Users:
+    - I need to keep store of all user who visits the app (So their IP address, device info, browser info, what social media account they came from with social media details etc.) and also keep store of all users who place orders (So their name, email, phone number, address, etc.)
+    - 
 
 
 
+The Design of the APP:
+    - The design of the app will be simple and user-friendly, focusing on ease of navigation for both customers and admins.
+    - Since the app is mostly for Bangladeshi customers, the design will be culturally appropriate and appealing to the target audience.
+    - Doo make it a bit elegant and modern, but not too flashy. so that the customers knows that we are not cheap or fake. (so that the customers can trust us and feel comfortable to place orders.)
+    - Definitly focus on mobile-first design, as most users will be accessing the app from their mobile devices.
+    - Make sure bangla font and language support is available for the app, as many users will prefer to use the app in their native language. In-fact we are going bangla first. So do choose a bangla font that is easy to read and looks good on mobile devices. (so that the customers can easily read the content and feel comfortable to place orders.)
+    - Do keep in mind many boomers will be using the app, so make sure the design is simple and easy to use for them. (so that they can easily navigate the app and place orders without any confusion.)
+    - Do use red color as our primary color. Kinda like Pathao Red Color or Pinterest Red Color.
+    - For the customer interface:
+        - A clean homepage showcasing featured products and categories.
+        - Product listing pages with filters and sorting options.
+        - Product detail pages with images, descriptions, and an "Add to Cart" button.
+        - A shopping cart page where customers can review their selected items before placing an order.
+        - An order confirmation page after placing an order.
+    - For the admin interface:
+        - A dashboard displaying a list of new orders with relevant details (customer name, product ordered, quantity, etc.).
+        - Each order will have a "Copy" icon to easily copy order details for manual processing.
+        - An option to mark orders as "Placed To Drop Shipping" once the manual process is completed or if integrated with a drop shipping service API.
 
+
+Extras:
+    - Do work on Privacy Policy and Terms & Conditions pages for the app. These pages should be easily accessible from the footer of the app.
+
+
+
+Things I missed:
+    - This is my first time doing drop shipping or social media e-commerce business. So do remind me if I missed anything important that I should consider for this app. That will be better for the business and the app.
 
 
 
