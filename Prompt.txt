@@ -24,6 +24,22 @@ Technology to use:
 
 
 
+Codebase:
+    - Keep the codebase clean and organized, following best practices for project structure and code organization.
+    - Use a monorepo structure to manage both frontend and backend code in a single repository.
+    - Use Docker and Docker Compose for local development, allowing for easy setup and management of the development environment. So for dev one single docker compose file will be enough to run the whole app (frontend and backend)
+    - For production, we'll deploy frontend and backend separately with separate docker compose files. (so for production, we'll have separate docker compose files for frontend and backend)
+    - Use environment variables for configuration settings, such as database connection strings and API keys, to keep sensitive information secure and easily configurable.
+    - Use prettier and eslint for code formatting and linting to maintain code quality and consistency across the codebase.
+    - Donot use any OOP or class based code. Use functional programming and functional components only. (so that the code is more readable and maintainable.)
+    - for state management use zustand.
+    - Donot make multiple component in single file unless it is a small component. (so that the code is more readable and maintainable.)
+    - Do try to make utilities and helper functions for repeated code. (so that the code is more readable and maintainable.)
+    - Add some of the necessary ruleset in CLAUDE.md file (only the neccessary one for future reference)
+    - for Authentication of admin panel use JWT token based authentication. use refresh token and access token.
+
+
+
 
 About the APP:
     - This is a simple e-commerce app. (that has regular delivery products but mostly third party delivery products that will be used as drop shipping. So we'll sell products that we don't have in stock and will be delivered by a third party.)
