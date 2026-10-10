@@ -1,0 +1,8 @@
+node_modules
+pnpm-lock.yaml
+dist
+.next
+.open-next
+.wrangler
+.turbo
+prompts

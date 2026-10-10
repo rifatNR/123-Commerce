@@ -1,0 +1,30 @@
+# Production backend. Railway/Render can build apps/api/Dockerfile directly; this file is for
+# running the same image on any VPS:
+#   docker compose -f docker-compose.prod.api.yml --env-file apps/api/.env.production up -d --build
+# Use a managed MongoDB (e.g. MongoDB Atlas) and set MONGODB_URI in the env file.
+name: 123commerce-api
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: 123commerce-api
+    restart: unless-stopped
+    env_file:
+      - apps/api/.env.production
+    environment:
+      NODE_ENV: production
+    ports:
+      - '4000:4000'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3

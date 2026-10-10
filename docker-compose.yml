@@ -1,0 +1,109 @@
+# Local development. Everything runs inside Docker, including `pnpm install`.
+#   docker compose up            -> install deps, start mongo + api + web
+#   docker compose run --rm tools pnpm <anything>
+name: 123commerce
+
+x-node: &node
+  build:
+    context: .
+    dockerfile: docker/dev.Dockerfile
+  image: 123commerce-dev
+  working_dir: /app
+  volumes:
+    - .:/app
+    # node_modules live in named volumes (fast, and never touch the host).
+    - node_modules:/app/node_modules
+    - api_node_modules:/app/apps/api/node_modules
+    - web_node_modules:/app/apps/web/node_modules
+    - shared_node_modules:/app/packages/shared/node_modules
+    - web_next:/app/apps/web/.next
+    - web_wrangler:/app/apps/web/.wrangler
+  environment:
+    # Store lives in the same volume as node_modules so pnpm can hard-link.
+    npm_config_store_dir: /app/node_modules/.pnpm-store
+    # File watching through Windows/WSL bind mounts needs polling.
+    CHOKIDAR_USEPOLLING: 'true'
+    WATCHPACK_POLLING: 'true'
+
+services:
+  install:
+    <<: *node
+    command: pnpm install
+    restart: 'no'
+
+  tools:
+    <<: *node
+    profiles: [tools]
+    command: bash
+    stdin_open: true
+    tty: true
+
+  mongo:
+    image: mongo:8
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', 'db.adminCommand("ping")']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    <<: *node
+    command: pnpm --filter @123/api dev
+    ports:
+      - '4000:4000'
+    env_file:
+      - path: apps/api/.env
+        required: false
+    environment:
+      npm_config_store_dir: /app/node_modules/.pnpm-store
+      CHOKIDAR_USEPOLLING: 'true'
+      NODE_ENV: development
+      LOG_LEVEL: ${API_LOG_LEVEL:-debug}
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB: commerce
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-only-access-secret-change-me-0123456789}
+      INGEST_API_KEY: ${INGEST_API_KEY:-dev-ingest-key-change-me}
+      CACHE_SYNC_SECRET: ${CACHE_SYNC_SECRET:-dev-cache-sync-secret}
+      FRONTEND_CACHE_SYNC_URL: http://web:3000/api/cache
+      CORS_ORIGINS: http://localhost:3000
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@123commerce.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin12345}
+    depends_on:
+      install:
+        condition: service_completed_successfully
+      mongo:
+        condition: service_healthy
+
+  web:
+    <<: *node
+    command: pnpm --filter @123/web dev
+    ports:
+      - '3000:3000'
+    env_file:
+      - path: apps/web/.env
+        required: false
+    environment:
+      npm_config_store_dir: /app/node_modules/.pnpm-store
+      WATCHPACK_POLLING: 'true'
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      API_INTERNAL_URL: http://api:4000
+      CACHE_SYNC_SECRET: ${CACHE_SYNC_SECRET:-dev-cache-sync-secret}
+    depends_on:
+      install:
+        condition: service_completed_successfully
+      api:
+        condition: service_started
+
+volumes:
+  node_modules:
+  api_node_modules:
+  web_node_modules:
+  shared_node_modules:
+  web_next:
+  web_wrangler:
+  mongo_data:

@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Primary red, close to Pinterest / Pathao red. */
+  --color-brand-50: #fff1f2;
+  --color-brand-100: #ffe1e4;
+  --color-brand-200: #ffc7ce;
+  --color-brand-300: #ff9aa7;
+  --color-brand-400: #ff5c72;
+  --color-brand-500: #f72847;
+  --color-brand-600: #e60023;
+  --color-brand-700: #c1001d;
+  --color-brand-800: #a0031c;
+  --color-brand-900: #85081d;
+
+  --font-sans: var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    /* Slightly larger base text: easier for older customers to read. */
+    font-size: 106.25%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-stone-50 text-stone-900 antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-600;
+  }
+}
+
+@utility container-page {
+  @apply mx-auto w-full max-w-6xl px-4;
+}

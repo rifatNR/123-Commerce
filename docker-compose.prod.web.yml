@@ -1,0 +1,23 @@
+# Production frontend = a Cloudflare Worker. This builds the Next.js app with OpenNext and
+# deploys it with wrangler, all inside Docker:
+#   docker compose -f docker-compose.prod.web.yml --env-file apps/web/.env.production run --rm deploy
+# Needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the env file.
+name: 123commerce-web
+
+services:
+  deploy:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?set NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_SITE_NAME: ${NEXT_PUBLIC_SITE_NAME:-123Commerce}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?set NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_SUPPORT_PHONE: ${NEXT_PUBLIC_SUPPORT_PHONE:-}
+        NEXT_PUBLIC_META_PIXEL_ID: ${NEXT_PUBLIC_META_PIXEL_ID:-}
+        NEXT_PUBLIC_IMAGE_LOADER: ${NEXT_PUBLIC_IMAGE_LOADER:-cloudflare}
+    image: 123commerce-web-deploy
+    environment:
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:?set CLOUDFLARE_API_TOKEN}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:?set CLOUDFLARE_ACCOUNT_ID}
+    command: pnpm --filter @123/web exec opennextjs-cloudflare deploy
