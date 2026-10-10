@@ -1,4 +1,4 @@
-import type { ProductDto, PublicProduct, PublicProductCard } from '@123/shared'
+import type { ProductDto, PublicProduct, PublicProductCard, PublicVariant } from '@123/shared'
 import type { ProductDoc } from '../db/types'
 
 export const toProductDto = (doc: ProductDoc): ProductDto => ({
@@ -9,6 +9,7 @@ export const toProductDto = (doc: ProductDoc): ProductDto => ({
   title: doc.title,
   description: doc.description,
   images: doc.images,
+  videos: doc.videos ?? [],
   price: doc.price,
   compareAtPrice: doc.compareAtPrice,
   costPrice: doc.costPrice,
@@ -16,6 +17,7 @@ export const toProductDto = (doc: ProductDoc): ProductDto => ({
   brandSlug: doc.brandSlug,
   categorySlugs: doc.categorySlugs,
   options: doc.options,
+  variants: doc.variants ?? [],
   attributes: doc.attributes,
   tags: doc.tags,
   fulfillment: doc.fulfillment,
@@ -27,11 +29,28 @@ export const toProductDto = (doc: ProductDoc): ProductDto => ({
   updatedAt: doc.updatedAt.toISOString(),
 })
 
-const isInStock = (doc: Pick<ProductDoc, 'stock'>) =>
-  doc.stock === undefined || doc.stock === null || doc.stock > 0
+const hasStock = (stock: number | null | undefined) =>
+  stock === undefined || stock === null || stock > 0
 
-const realCompareAt = (doc: Pick<ProductDoc, 'price' | 'compareAtPrice'>) =>
-  doc.compareAtPrice && doc.compareAtPrice > doc.price ? doc.compareAtPrice : null
+/** With variants, the product is in stock while any variant is. */
+const isInStock = (doc: Pick<ProductDoc, 'stock' | 'variants'>) =>
+  doc.variants?.length ? doc.variants.some((v) => hasStock(v.stock)) : hasStock(doc.stock)
+
+const realCompareAt = (price: number, compareAtPrice: number | undefined) =>
+  compareAtPrice && compareAtPrice > price ? compareAtPrice : null
+
+const toPublicVariants = (doc: ProductDoc): PublicVariant[] =>
+  (doc.variants ?? []).map((v) => {
+    const price = v.price ?? doc.price
+    return {
+      sku: v.sku,
+      options: v.options,
+      price,
+      compareAtPrice: realCompareAt(price, v.compareAtPrice ?? doc.compareAtPrice),
+      inStock: hasStock(v.stock),
+      image: v.image ?? null,
+    }
+  })
 
 export const toPublicCard = (doc: ProductDoc): PublicProductCard => ({
   id: doc._id.toHexString(),
@@ -39,7 +58,7 @@ export const toPublicCard = (doc: ProductDoc): PublicProductCard => ({
   title: doc.title,
   images: doc.images.slice(0, 1),
   price: doc.price,
-  compareAtPrice: realCompareAt(doc),
+  compareAtPrice: realCompareAt(doc.price, doc.compareAtPrice),
   inStock: isInStock(doc),
 })
 
@@ -49,12 +68,14 @@ export const toPublicProduct = (doc: ProductDoc): PublicProduct => ({
   title: doc.title,
   description: doc.description ?? null,
   images: doc.images,
+  videos: doc.videos ?? [],
   price: doc.price,
-  compareAtPrice: realCompareAt(doc),
+  compareAtPrice: realCompareAt(doc.price, doc.compareAtPrice),
   inStock: isInStock(doc),
   brandSlug: doc.brandSlug,
   categorySlugs: doc.categorySlugs,
   options: doc.options,
+  variants: toPublicVariants(doc),
   attributes: doc.attributes,
   deliveryDays: doc.deliveryDays ?? null,
   updatedAt: doc.updatedAt.toISOString(),
@@ -68,4 +89,5 @@ export const cardProjection = {
   price: 1,
   compareAtPrice: 1,
   stock: 1,
+  'variants.stock': 1,
 } as const

@@ -3,12 +3,14 @@
 import type { PublicProduct } from '@123/shared'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import OptionPicker from '@/components/product/option-picker'
 import { buttonClass } from '@/components/ui/button-styles'
 import QuantityStepper from '@/components/ui/quantity-stepper'
 import { t } from '@/i18n/bn'
-import { cn } from '@/lib/cn'
 import { trackPixel } from '@/lib/meta-pixel'
+import { choose, selectedVariant } from '@/lib/variants'
 import { MAX_QTY, useCartStore } from '@/stores/cart-store'
+import { useSelectedOptions, useSelectionStore } from '@/stores/product-selection-store'
 import { toast } from '@/stores/toast-store'
 
 type Props = { product: PublicProduct }
@@ -17,10 +19,13 @@ export default function AddToCart({ product }: Props) {
   const router = useRouter()
   const add = useCartStore((s) => s.add)
   const [quantity, setQuantity] = useState(1)
-  const [options, setOptions] = useState<Record<string, string>>({})
+  const options = useSelectedOptions(product.id)
+  const setOptions = useSelectionStore((s) => s.setOptions)
   const [showErrors, setShowErrors] = useState(false)
 
   const missing = product.options.filter((o) => !options[o.name])
+  const variant = selectedVariant(product, options)
+  const price = variant?.price ?? product.price
 
   const addToCart = () => {
     if (missing.length > 0) {
@@ -28,19 +33,24 @@ export default function AddToCart({ product }: Props) {
       toast(t.product.selectOption(missing[0]!.name), 'error')
       return false
     }
+    // Every option is picked, so with variants there must be a matching one in stock.
+    if (product.variants.length > 0 && !variant?.inStock) {
+      toast(t.product.variantSoldOut, 'error')
+      return false
+    }
     add({
       productId: product.id,
       slug: product.slug,
       title: product.title,
-      image: product.images[0]?.url ?? null,
-      price: product.price,
+      image: variant?.image ?? product.images[0]?.url ?? null,
+      price,
       quantity,
       options,
     })
     trackPixel('AddToCart', {
       content_ids: [product.id],
       content_type: 'product',
-      value: product.price * quantity,
+      value: price * quantity,
       currency: 'BDT',
     })
     return true
@@ -57,37 +67,14 @@ export default function AddToCart({ product }: Props) {
   return (
     <div className="flex flex-col gap-5">
       {product.options.map((option) => (
-        <fieldset key={option.name}>
-          <legend
-            className={cn(
-              'mb-2 font-semibold',
-              showErrors && !options[option.name] && 'text-brand-700',
-            )}
-          >
-            {t.product.selectOption(option.name)}
-          </legend>
-          <div className="flex flex-wrap gap-2">
-            {option.values.map((value) => {
-              const selected = options[option.name] === value
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => setOptions((o) => ({ ...o, [option.name]: value }))}
-                  className={cn(
-                    'min-h-11 min-w-12 rounded-xl px-4 font-medium ring-1',
-                    selected
-                      ? 'bg-brand-600 text-white ring-brand-600'
-                      : 'bg-white ring-stone-300 hover:ring-brand-400',
-                  )}
-                >
-                  {value}
-                </button>
-              )
-            })}
-          </div>
-        </fieldset>
+        <OptionPicker
+          key={option.name}
+          product={product}
+          option={option}
+          chosen={options}
+          showError={showErrors && !options[option.name]}
+          onChoose={(value) => setOptions(product.id, choose(product, options, option.name, value))}
+        />
       ))}
 
       <div className="flex items-center gap-3">

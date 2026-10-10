@@ -16,12 +16,14 @@ API ──after data changes──▶ POST web/api/cache  (bump cache generation
 
 ```bash
 docker compose up            # installs deps in a container, starts mongo, api (:4000), web (:3000)
-docker compose run --rm api pnpm --filter @123/api seed          # optional demo products
+./Hack/Database/seed.sh      # optional demo products
 ```
 
 - Store: http://localhost:3000
 - Admin: http://localhost:3000/admin (dev login `admin@123commerce.com` / `admin12345`)
 - API: http://localhost:4000/trpc, health check at `/health`
+
+All commands (dev, checks, database dump/restore/seed): see [HOW_TO_RUN.md](HOW_TO_RUN.md).
 
 Run any other command in the tools container:
 
@@ -74,7 +76,16 @@ Minimal example:
         "costPrice": 850,
         "categories": [{ "slug": "kitchen", "name": { "bn": "রান্নাঘর" } }],
         "brand": { "slug": "miyako", "name": { "en": "Miyako" } },
-        "options": [{ "name": "রঙ", "values": ["লাল", "কালো"] }]
+        "videos": [{ "url": "https://cdn.example.com/kettle.mp4" }],
+        "options": [{ "name": "রঙ", "values": ["লাল", "কালো"] }],
+        "variants": [
+          {
+            "sku": "SKU-123-RED",
+            "options": { "রঙ": "লাল" },
+            "image": "https://cdn.example.com/kettle-red.jpg"
+          },
+          { "sku": "SKU-123-BLK", "options": { "রঙ": "কালো" }, "price": 1390, "stock": 0 }
+        ]
       },
       "raw": { "...": "original supplier JSON" }
     }
@@ -85,6 +96,10 @@ Minimal example:
 Dedupe flow: call `sources.productRefs`, skip items whose `hash` matches, import the rest. The default hash is
 `sha1(JSON.stringify(raw ?? product))`, or send your own `hash`. If you leave `visible`/`featured` out,
 re-imports keep whatever the admin set.
+
+Variants: each variant sets a value for every option. Customers can only buy listed variants,
+and a variant's `price`/`compareAtPrice`/`costPrice`/`stock` override the product's when set.
+Without `variants`, every option combination is buyable at the product price.
 
 ## Production
 

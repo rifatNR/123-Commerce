@@ -4,6 +4,7 @@ import type {
   FulfillmentType,
   LocalizedText,
   OrderStatus,
+  ProductVariant,
   SourceType,
 } from '@123/shared'
 import type { ObjectId } from 'mongodb'
@@ -19,6 +20,8 @@ export type ProductDoc = Timestamps & {
   title: LocalizedText
   description?: LocalizedText
   images: { url: string; alt?: string }[]
+  /** Missing on docs stored before schema v2. */
+  videos?: { url: string; poster?: string }[]
   price: number
   compareAtPrice?: number
   costPrice?: number
@@ -26,6 +29,8 @@ export type ProductDoc = Timestamps & {
   brandSlug: string | null
   categorySlugs: string[]
   options: { name: string; values: string[] }[]
+  /** Missing on docs stored before schema v2. */
+  variants?: ProductVariant[]
   attributes: { name: string; value: string }[]
   tags: string[]
   fulfillment: FulfillmentType
@@ -77,6 +82,8 @@ export type OrderItemDoc = {
   costPrice: number | null
   quantity: number
   options: Record<string, string>
+  /** Missing on orders placed before variants existed. */
+  variantSku?: string | null
   sourceSlug: string
   externalId: string
   fulfillment: FulfillmentType

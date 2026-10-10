@@ -1,0 +1,5 @@
+{
+  "//": "Not a workspace package. Only makes tsx treat these scripts as ES modules.",
+  "private": true,
+  "type": "module"
+}

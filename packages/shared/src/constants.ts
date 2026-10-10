@@ -22,7 +22,7 @@ export const PRODUCT_SORTS = ['newest', 'price_asc', 'price_desc'] as const
 export type ProductSort = (typeof PRODUCT_SORTS)[number]
 
 /** Bump when the stored product document shape changes, so old docs can be migrated lazily. */
-export const PRODUCT_SCHEMA_VERSION = 1
+export const PRODUCT_SCHEMA_VERSION = 2
 
 export const PAGE_SIZE = 24
 export const IMPORT_BATCH_MAX = 200

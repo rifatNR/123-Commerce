@@ -3,13 +3,13 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import AddToCart from '@/components/product/add-to-cart'
 import ProductGallery from '@/components/product/product-gallery'
+import ProductPrice from '@/components/product/product-price'
 import ProductGrid from '@/components/product/product-grid'
 import SectionHeading from '@/components/product/section-heading'
 import ShareButtons from '@/components/product/share-buttons'
 import JsonLd from '@/components/seo/json-ld'
 import { buttonClass } from '@/components/ui/button-styles'
 import { PhoneIcon, TruckIcon } from '@/components/ui/icons'
-import Price from '@/components/ui/price'
 import { t } from '@/i18n/bn'
 import { publicEnv } from '@/lib/env'
 import { formatNumber, text } from '@/lib/format'
@@ -68,7 +68,7 @@ export default async function ProductPage({ params }: Props) {
       />
 
       <div className="grid gap-6 md:grid-cols-2 md:gap-10">
-        <ProductGallery images={product.images} title={title} />
+        <ProductGallery product={product} title={title} />
 
         <div className="flex flex-col gap-5">
           {categories[0] && (
@@ -86,12 +86,7 @@ export default async function ProductPage({ params }: Props) {
               <span className="font-medium text-stone-800">{text(brand.name)}</span>
             </p>
           )}
-          <Price
-            price={product.price}
-            compareAtPrice={product.compareAtPrice}
-            size="lg"
-            showBadge
-          />
+          <ProductPrice product={product} />
           {product.deliveryDays && (
             <p className="flex items-center gap-2 text-stone-700">
               <TruckIcon className="size-5 text-brand-600" />

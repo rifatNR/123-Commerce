@@ -2,6 +2,7 @@ import {
   PRODUCT_SCHEMA_VERSION,
   cacheKeys,
   slugify,
+  variantsIssue,
   type ProductInput,
   type ProductPatch,
 } from '@123/shared'
@@ -150,6 +151,17 @@ export const updateProduct = async (
   filter: { _id: ObjectId } | { sourceSlug: string; externalId: string },
   patch: ProductPatch,
 ) => {
+  if (patch.options !== undefined || patch.variants !== undefined) {
+    const current = await collections
+      .products()
+      .findOne(filter, { projection: { options: 1, variants: 1 } })
+    if (!current) throw new TRPCError({ code: 'NOT_FOUND', message: 'Product not found' })
+    const issue = variantsIssue({
+      options: patch.options ?? current.options,
+      variants: patch.variants ?? current.variants ?? [],
+    })
+    if (issue) throw new TRPCError({ code: 'BAD_REQUEST', message: issue })
+  }
   await resolveCatalogRefs([patch])
   const doc = await collections
     .products()

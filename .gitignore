@@ -11,3 +11,6 @@ dist
 .dev.vars
 next-env.d.ts
 .DS_Store
+
+# Database dumps (contain customer data)
+Hack/Database/dumps/

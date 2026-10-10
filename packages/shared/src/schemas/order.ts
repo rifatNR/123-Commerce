@@ -71,6 +71,8 @@ export type OrderItemDto = {
   costPrice: number | null
   quantity: number
   options: Record<string, string>
+  /** The chosen variant's SKU at the source, for placing the dropship order. */
+  variantSku: string | null
   sourceSlug: string
   externalId: string
   fulfillment: FulfillmentType

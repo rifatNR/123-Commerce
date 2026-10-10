@@ -1,4 +1,4 @@
-import type { OrderCreateInput, OrderCreatedDto } from '@123/shared'
+import { findVariant, type OrderCreateInput, type OrderCreatedDto } from '@123/shared'
 import { TRPCError } from '@trpc/server'
 import { ObjectId } from 'mongodb'
 import { collections } from '../db/collections'
@@ -38,17 +38,25 @@ export const createOrder = async (
       const chosen = line.options[option.name]
       if (!chosen || !option.values.includes(chosen)) fail(`"${option.name}" নির্বাচন করুন`)
     }
-    if (typeof product.stock === 'number' && product.stock < line.quantity)
-      fail('পর্যাপ্ত স্টক নেই')
+    const options = Object.fromEntries(
+      product.options.map((o) => [o.name, line.options[o.name] ?? '']),
+    )
+    // With variants, only listed combinations can be bought, at the variant's own price/stock.
+    const variant = product.variants?.length
+      ? (findVariant(product.variants, options) ?? fail('এই অপশনটি পাওয়া যাচ্ছে না'))
+      : null
+    const stock = variant ? variant.stock : product.stock
+    if (typeof stock === 'number' && stock < line.quantity) fail('পর্যাপ্ত স্টক নেই')
     return {
       productId: product._id,
       slug: product.slug,
       title: product.title,
-      image: product.images[0]?.url ?? null,
-      price: product.price,
-      costPrice: product.costPrice ?? null,
+      image: variant?.image ?? product.images[0]?.url ?? null,
+      price: variant?.price ?? product.price,
+      costPrice: variant?.costPrice ?? product.costPrice ?? null,
       quantity: line.quantity,
-      options: Object.fromEntries(product.options.map((o) => [o.name, line.options[o.name] ?? ''])),
+      options,
+      variantSku: variant?.sku ?? null,
       sourceSlug: product.sourceSlug,
       externalId: product.externalId,
       fulfillment: product.fulfillment,

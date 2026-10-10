@@ -1,6 +1,6 @@
 'use client'
 
-import type { LocalizedText } from '@123/shared'
+import { variantKey, type LocalizedText } from '@123/shared'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
@@ -28,10 +28,7 @@ type CartState = {
 export const MAX_QTY = 20
 
 const itemKey = (productId: string, options: Record<string, string>) =>
-  `${productId}:${Object.entries(options)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([k, v]) => `${k}=${v}`)
-    .join('&')}`
+  `${productId}:${variantKey(options)}`
 
 const clampQty = (n: number) => Math.min(MAX_QTY, Math.max(1, Math.floor(n)))
 

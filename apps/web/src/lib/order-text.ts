@@ -17,7 +17,7 @@ export const orderToText = (order: OrderDto, items = order.items) =>
       const opts = Object.entries(i.options)
         .map(([k, v]) => `${k}: ${v}`)
         .join(', ')
-      return `- ${pickText(i.title)}${opts ? ` (${opts})` : ''} x${i.quantity} — ${i.price * i.quantity} BDT [${i.sourceSlug}/${i.externalId}]`
+      return `- ${pickText(i.title)}${opts ? ` (${opts})` : ''} x${i.quantity} — ${i.price * i.quantity} BDT [${i.sourceSlug}/${i.externalId}${i.variantSku ? `/${i.variantSku}` : ''}]`
     }),
     '',
     `Subtotal: ${order.subtotal} BDT`,

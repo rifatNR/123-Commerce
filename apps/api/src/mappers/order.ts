@@ -9,6 +9,7 @@ export const toOrderDto = (doc: OrderDoc): OrderDto => ({
   items: doc.items.map((item) => ({
     ...item,
     productId: item.productId.toHexString(),
+    variantSku: item.variantSku ?? null,
     dropship: {
       placed: item.dropship.placed,
       placedAt: item.dropship.placedAt?.toISOString() ?? null,

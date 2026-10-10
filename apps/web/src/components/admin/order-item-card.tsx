@@ -60,6 +60,12 @@ export default function OrderItemCard({
             Source: {item.sourceSlug} / {item.externalId}
             <CopyButton value={item.externalId} />
           </p>
+          {item.variantSku && (
+            <p className="flex items-center gap-1 text-sm text-stone-500">
+              Variant SKU: {item.variantSku}
+              <CopyButton value={item.variantSku} />
+            </p>
+          )}
         </div>
       </div>
 
