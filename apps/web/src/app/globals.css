@@ -13,7 +13,7 @@
   --color-brand-800: #a0031c;
   --color-brand-900: #85081d;
 
-  --font-sans: var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-bangla-digits), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {

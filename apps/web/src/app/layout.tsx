@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Hind_Siliguri } from 'next/font/google'
+import localFont from 'next/font/local'
 import Toaster from '@/components/ui/toaster'
 import { publicEnv } from '@/lib/env'
 import './globals.css'
@@ -10,6 +11,17 @@ const bangla = Hind_Siliguri({
   weight: ['400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-bangla',
+})
+
+// Hind Siliguri's Bangla digits (০-৯) are hard to read, so digits come from Noto Sans Bengali instead.
+// The file holds only those 10 glyphs (~7 KB), so every other character falls through to Hind Siliguri.
+// No fallback font: a fallback here would catch all non-digit text before Hind Siliguri does.
+const digits = localFont({
+  src: '../fonts/noto-sans-bengali-digits.woff2',
+  weight: '400 700',
+  display: 'swap',
+  variable: '--font-bangla-digits',
+  adjustFontFallback: false,
 })
 
 export const metadata: Metadata = {
@@ -32,7 +44,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="bn" className={bangla.variable}>
+    <html lang="bn" className={`${bangla.variable} ${digits.variable}`}>
       <body className="min-h-dvh font-sans">
         {children}
         <Toaster />
